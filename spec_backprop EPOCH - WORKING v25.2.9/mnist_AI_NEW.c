@@ -22,7 +22,7 @@
 #define THRESHOLD 0.25
 #define BETA 0
 #define ALPHA 1
-#define EPOCH 1
+#define EPOCH 10
 
 #define Train_Data_File_Pixels "mnist_data/train-images.idx3-ubyte"
 #define Train_Data_File_Labels "mnist_data/train-labels.idx1-ubyte"
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
 					//printf("The current label is %d\n", current_label);
 					//printf("%d\n", i);
 				}
-				if (output_acc_First_Prop[current_label] == true) {
+				if (output_acc_First_Prop[current_label] == true || THRESHOLD == 0) {
 					// If it's the first time the label has been forward propogated, yield for all other threads then execute.
 					#pragma omp barrier
 					#pragma omp single
@@ -242,7 +242,10 @@ int main(int argc, char* argv[]) {
 			if (i % BATCH_SIZE == 0) {
 				ApplyGradient();
 			}
-			setPrevFP(current_label);
+
+			if (THRESHOLD != 0) {
+				setPrevFP(current_label);
+			}
 		}
 	}
 	end = clock();
